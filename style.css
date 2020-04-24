@@ -42,3 +42,8 @@ div {
     justify-content: center;
     width: 65%;
 }
+
+img {
+    width: 100px;
+    height: 125px;
+}
