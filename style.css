@@ -1,0 +1,44 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: lightseagreen;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 36px;
+    font-weight: bold;
+
+
+
+}
+div {
+    display: flex;
+    justify-content: center;
+    margin-top: 25px;
+
+
+
+}
+#table {
+    display: flex;
+    flex-direction: column;
+    width: 50vw;
+    margin-right: auto;
+}
+
+#messages {
+    height: 70px;
+}
+
+#dealer-hand, #player-hand {
+    display: flex;
+    background-color: rgb(99, 228, 189);
+    height: 130px;
+    width: auto;
+
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    width: 65%;
+}
