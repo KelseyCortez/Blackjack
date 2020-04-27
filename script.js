@@ -10,7 +10,7 @@ function createSuit(type) {
     //     suit.push(createCard(i, type));
 
     // }
-    values.forEach(function (item){
+    values.forEach(function (item) {
         suit.push(createCard(item, type))
     })
 
@@ -39,14 +39,10 @@ const standButton = document.querySelector('#stand-button');
 
 
 dealButton.addEventListener('click', function (e) {
-    const card1 = document.createElement('img');
-    const card2 = document.createElement('img');
-    const card3 = document.createElement('img');
-    const card4 = document.createElement('img');
-    card1.setAttribute('src', './images/5_of_hearts.png');
-    card2.setAttribute('src', './images/king_of_spades.png');
-    card3.setAttribute('src', './images/jack_of_diamonds.png');
-    card4.setAttribute('src', './images/2_of_clubs.png');
+    const card1 = randomCard();
+    const card2 = randomCard();
+    const card3 = randomCard();
+    const card4 = randomCard();
     dealerHand.append(card1);
     dealerHand.append(card2);
     playerHand.append(card3);
@@ -55,8 +51,49 @@ dealButton.addEventListener('click', function (e) {
 })
 
 hitButton.addEventListener('click', function (e) {
-    const card = document.createElement('img');
-    card.setAttribute('src', './images/6_of_clubs.png');
+    const card = randomCard();
     playerHand.append(card);
 
 })
+
+function randomCard() {
+    let removeRandomCard = deck[Math.floor(Math.random() * Math.floor(deck.length))];
+    deck = deck.filter(function (card) {
+        return card != removeRandomCard
+    })
+
+const cardImage = document.createElement('img');
+cardImage.setAttribute('src', `blackjack.images/${removeRandomCard.item}${removeRandomCard.suit}.jpg`)
+return cardImage
+
+function getCardImageUrl(card) {
+    if (card.point === 1) {
+        cardName = 'ace';
+    } else if (card.point === 11) {
+        cardName = 'jack';
+    } else if (card.point === 12) {
+        cardName = 'queen';
+    } else if (card.point === 13) {
+        cardName = 'king';
+    } else {
+        cardName = card.point;
+    }
+    return 'images/' + cardName + '_of_' + card.suit + '.png';
+}
+
+function calculatePoints(cards) {
+    cards = cards.slice(0);
+    cards.sort(function (a, b) {
+        return b.point - a.point;
+    });
+
+    return cards.reduce(function (sum, card) {
+        const point = card.point;
+        if (point > 10) {
+            point = 10;
+        }
+        if (point === 1 && sum < 11) {
+            point = 11;
+        }
+        return sum + point;
+    }, 0);
