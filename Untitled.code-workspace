@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"name": "images",
+			"path": "/Users/kelseycortez/Downloads/images"
+		},
+		{
+			"name": "blackjack",
+			"path": "."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "blackjack",
+		"liveServer.settings.port": 5501
+	}
+}
