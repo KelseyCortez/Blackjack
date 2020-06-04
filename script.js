@@ -1,5 +1,5 @@
 //sets values for cards
-const values = ["ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king"];
+const values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 
 //sets query selectors 
 let dealerPoints = document.querySelector('#dealer-points');
@@ -15,14 +15,11 @@ const standButton = document.querySelector('#stand-button');
 
 //functional deal button
 dealButton.addEventListener('click', (function (e) {
-    const card1 = randomCard();
-    const card2 = randomCard();
-    const card3 = randomCard();
-    const card4 = randomCard();
-    dealerField.append(card1);
-    dealerField.append(card2);
-    playerField.append(card3);
-    playerField.append(card4);
+    dealACard(playerHand, playerField);
+    dealACard(playerHand, playerField);
+    dealACard(dealerHand, dealerField);
+    dealACard(dealerHand, dealerField);
+
 
 }));
 
@@ -35,7 +32,7 @@ function createCard(point, suit) {
 }
 function createSuit(type) {
     let suit = [];
-    values.forEach(function(item) {
+    values.forEach(function (item) {
         suit.push(createCard(item, type))
     })
     return suit;
@@ -56,24 +53,21 @@ console.log(createDeck());
 let deck = createDeck();
 let dealerHand = [];
 let playerHand = [];
+let hasStand = false;
 
 //removes random card from the deck
 function randomCard() {
-    let removeRandomCard = deck[Math.floor(Math.random() * Math.floor(deck.length))];
-    deck = deck.filter(function (card) {
-        return card != removeRandomCard;
-    })
-    const cardImage = document.createElement('img');
-    cardImage.setAttribute('src', `./images/${removeRandomCard.point}_of_${removeRandomCard.suit}.png`);
-    console.log(cardImage);
-    return cardImage
+    let removeRandomCard = deck[Math.floor(Math.random() * deck.length)];
+    let cardIndex = deck.findIndex(card => {
+        return card.point === removeRandomCard.point && card.suit === removeRandomCard.suit;
+    });
+    deck.splice(cardIndex, 1);
+    return removeRandomCard;
 }
 
 //functioning hit button
 hitButton.addEventListener('click', (function (e) {
-    const card = randomCard();
-    playerField.append(card);
-
+    dealACard(playerHand, playerField);
 }));
 //creates a score
 
@@ -83,29 +77,26 @@ function renderScore(point) {
     ${point}
     </div>`
 };
+
 // check for bust
 function updateScoreDisplay() {
-    let dealerPoints = calculatePoints(dealerHand);
-    $('#dealer-points').text(dealerPoints);
-    let playerPoints = calculatePoints(playerHand);
-    $('#player-points').text(playerPoints);
+    let dPoints = calculatePoints(dealerHand);
+    dealerPoints.textContent = dPoints;
+    let pPoints = calculatePoints(playerHand);
+    playerPoints.textContent = pPoints;
+    whoWins();
 }
 
-// function dealDeck(deck){
-//     messages.innerHTML = "";
-//     dealerHand = [];
-//     playerHand = [];
-
-// }
 function getCardImageUrl(card) {
-    if (cardName = 'ace') {
-        card.point === 1;
-    } else if (cardName = 'jack') {
-        card.point === 11;
-    } else if (cardName = 'queen') {
-        card.point === 12;
-    } else if (cardName = 'king') {
-        card.point === 13;
+    let cardName;
+    if (card.point === 1) {
+        cardName = 'ace';
+    } else if (card.point === 11) {
+        cardName = 'jack';
+    } else if (card.point === 12) {
+        cardName = 'queen';
+    } else if (card.point === 13) {
+        cardName = 'king';
     } else {
         cardName = card.point;
     }
@@ -113,66 +104,64 @@ function getCardImageUrl(card) {
 }
 
 function dealACard(handArray, elementSelector) {
-    card = deck.pop();
+    card = randomCard();
     handArray.push(card);
     cardUrl = getCardImageUrl(card);
-    $(elementSelector).append(
-        '<img src="' + cardUrl + '"/>'
-    );
+    const cardImage = document.createElement('img');
+    cardImage.setAttribute('src', cardUrl);
+    elementSelector.append(cardImage);
     updateScoreDisplay();
 }
 
 function calculatePoints(cards) {
-    cards = cards.slice(0);
     cards.sort(function (a, b) {
         return b.point - a.point;
-    });
-
-};
-standButton.click(function(e) {
-    while (calculatePoints(dealerField) < 17) {
-        dealACard(dealerField, '#dealer-hand');
-
-    }
-    // function gameOver() {
-    //     $('#hit-button').hide();
-    //     $('#stand-button').hide();
-    //     $('#play-again').show();
-    // }
-
-    //check for busts
-
-    if (calculatePoints(dealerHand) > 21) {
-        // dealer busts
-        $('#messages').text('Dealer busts! You win!');
-    } else if (calculatePoints(playerHand) > 21) {
-        // player busts
-        $('#messages').text('You bust!');
-    } else {
-        // determine winner
-        let dealerPoints = calculatePoints(dealerField);
-        let playerPoints = calculatePoints(playerField);
-        let messages = '';
-        if (dealerPoints > playerPoints) {
-            messages = 'You lose!';
-        } else if (dealerPoints < playerPoints) {
-            messages = 'You win!';
+    })
+    let total = 0;
+    for (let card of cards) {
+        if (card.point > 1 && card.point < 10) {
+            total += card.point;
+        } else if (card.point >= 10) {
+            total += 10;
         } else {
-            messages = 'Push.'
+            if (total > 10) {
+                total += 1;
+
+            } else {
+                total += 11
+            }
         }
-        $('#messages').text(messages);
     }
-    gameOver();
+    return total;
+};
+standButton.addEventListener('click', function (e) {
+    while (calculatePoints(dealerHand) < 17) {
+        dealACard(dealerHand, dealerField);
+        
+    }
+    hasStand = true;
+    whoWins();
 });
 
-
-// return cards.reduce(function (sum, card) {
-//     const point = card.point;
-//     if (point > 10) {
-//         point = 10;
-//     }
-//     if (point === 1 && sum < 11) {
-//         point = 11;
-//     }
-//     return sum + point;
-// }, 0);
+function whoWins() {
+if (calculatePoints(playerHand) > 21) {
+    // player busts
+    messages.textContent = 'You bust!';
+ } else if (calculatePoints(dealerHand) > 21) {
+        // dealer busts
+        messages.textContent = 'Dealer busts! You win!';
+    } else if(hasStand) {
+        // determine winner
+        let dealerPoints = calculatePoints(dealerHand);
+        let playerPoints = calculatePoints(playerHand);
+        let msg = '';
+        if (dealerPoints > playerPoints) {
+            msg = 'You lose!';
+        } else if (dealerPoints < playerPoints) {
+            msg = 'You win!';
+        } else {
+            msg = 'Push.'
+        }
+        messages.textContent = msg;
+    }
+}
